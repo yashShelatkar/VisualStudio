@@ -35,12 +35,26 @@ namespace GitHub.VisualStudio
         {
             //Debug.Listeners.Add(new VSTraceListener());
             var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ApplicationInfo.ApplicationName);
-            defaultLogPath = Path.Combine(dir, ApplicationInfo.ApplicationName + "-te.log");
+            defaultLogPath = Path.Combine(dir, ApplicationInfo.ApplicationName + "-" + GetProcessTag() + ".log");
             try
             {
                 Directory.CreateDirectory(dir);
             }
             catch { }
+        }
+
+        // Get a tag for the log file based on the current process name.
+        static string GetProcessTag()
+        {
+            var processName = Process.GetCurrentProcess().ProcessName;
+            switch(processName)
+            {
+                case "devenv":
+                    // Don't change the original log filename without consulting team.
+                    return "te";
+                default:
+                    return processName;
+            }
         }
 
         public static void SetLogger(Action<string> log)

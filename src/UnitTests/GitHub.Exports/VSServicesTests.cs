@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using GitHub.Services;
+using GitHub.VisualStudio;
 using NSubstitute;
 using Xunit;
 using DTE = EnvDTE.DTE;
@@ -40,11 +41,7 @@ public class VSServicesTests
         public void RepoDirExistsFalse_ReturnFalse()
         {
             var repoDir = @"x:\repo";
-            var os = Substitute.For<IOperatingSystem>();
-            //var directoryInfo = Substitute.For<IDirectoryInfo>();
-            //directoryInfo.Exists.Returns(false);
-            //os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
-            var target = CreateVSServices(null, os: os);
+            var target = CreateVSServices(repoDir, repoDirExists: false);
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -63,6 +60,7 @@ public class VSServicesTests
             directoryInfo.When(di => di.Delete(true)).Do(
                 ci => { throw new IOException(); });
             var target = CreateVSServices(repoDir, os: os);
+            VsOutputLogger.SetLogger(_ => { }); // don't spam the log
 
             var success = target.TryOpenRepository(repoDir);
 
@@ -85,7 +83,7 @@ public class VSServicesTests
             directoryInfo.Received().Delete(true);
         }
 
-        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null)
+        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null, bool repoDirExists = true)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
@@ -93,7 +91,7 @@ public class VSServicesTests
             if (repoDir != null)
             {
                 var directoryInfo = Substitute.For<IDirectoryInfo>();
-                directoryInfo.Exists.Returns(true);
+                directoryInfo.Exists.Returns(repoDirExists);
                 os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
             }
 

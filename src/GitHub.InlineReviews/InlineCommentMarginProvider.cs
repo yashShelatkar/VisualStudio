@@ -30,22 +30,28 @@ namespace GitHub.InlineReviews
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestStatusManager pullRequestStatusManager;
 
         [ImportingConstructor]
         public InlineCommentMarginProvider(
             IEditorFormatMapService editorFormatMapService,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
-            IPullRequestSessionManager sessionManager)
+            IPullRequestSessionManager sessionManager,
+            IPullRequestStatusManager pullRequestStatusManager)
         {
             this.editorFormatMapService = editorFormatMapService;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
             this.sessionManager = sessionManager;
+            this.pullRequestStatusManager = pullRequestStatusManager;
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
         {
+            // HACK: When should we show the PR status?
+            pullRequestStatusManager.ShowStatus();
+
             var textView = wpfTextViewHost.TextView;
             var editorFormatMap = editorFormatMapService.GetEditorFormatMap(textView);
             var glyphFactory = new InlineCommentGlyphFactory(peekService, textView, editorFormatMap);

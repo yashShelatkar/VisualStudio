@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using Task = System.Threading.Tasks.Task;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.Services
 {
@@ -33,5 +33,7 @@ namespace GitHub.Services
         public Task IncrementWelcomeDocsClicks() => inner.IncrementWelcomeDocsClicks();
         public Task IncrementWelcomeTrainingClicks() => inner.IncrementWelcomeTrainingClicks();
         public Task IncrementGitHubPaneHelpClicks() => inner.IncrementGitHubPaneHelpClicks();
+        public Task IncrementNumberOfPullRequestInlineCommentsOpened() => inner.IncrementNumberOfPullRequestInlineCommentsOpened();
+        public Task IncrementNumberOfPullRequestInlineCommentsPosted()=>  inner.IncrementNumberOfPullRequestInlineCommentsPosted();
     }
 }

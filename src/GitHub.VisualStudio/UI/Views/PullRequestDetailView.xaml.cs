@@ -68,7 +68,7 @@ namespace GitHub.VisualStudio.UI.Views
 
         void DoOpenOnGitHub()
         {
-            var repo = TeamExplorerServiceHolder.ActiveRepo;
+            var repo = ViewModel.RemoteRepository;
             var browser = VisualStudioBrowser;
             var url = repo.CloneUrl.ToRepositoryUrl().Append("pull/" + ViewModel.Model.Number);
             browser.OpenUrl(url);
@@ -93,7 +93,7 @@ namespace GitHub.VisualStudio.UI.Views
             {
                 var fileNames = await ViewModel.ExtractDiffFiles(file);
                 var relativePath = System.IO.Path.Combine(file.DirectoryPath, file.FileName);
-                var fullPath = System.IO.Path.Combine(ViewModel.Repository.LocalPath, relativePath);
+                var fullPath = System.IO.Path.Combine(ViewModel.LocalRepository.LocalPath, relativePath);
                 var leftLabel = $"{relativePath};{ViewModel.TargetBranchDisplayName}";
                 var rightLabel = $"{relativePath};PR {ViewModel.Model.Number}";
                 var caption = $"Diff - {file.FileName}";
@@ -162,7 +162,7 @@ namespace GitHub.VisualStudio.UI.Views
         void FileListMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var item = (e.OriginalSource as Visual)?.GetSelfAndVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
-            
+
             if (item != null)
             {
                 // Select tree view item on right click.
@@ -216,8 +216,8 @@ namespace GitHub.VisualStudio.UI.Views
         {
             var model = (object)ViewModel.Model;
             Services.Dte.Commands.Raise(
-                GlobalCommands.CommandSetString,
-                GlobalCommands.ShowPullRequestCommentsId,
+                Guids.CommandSetString,
+                PkgCmdIDList.ShowPullRequestCommentsId,
                 ref model,
                 null);
         }
@@ -242,8 +242,8 @@ namespace GitHub.VisualStudio.UI.Views
                     await Task.Delay(1500);
 
                     Services.Dte.Commands.Raise(
-                        GlobalCommands.CommandSetString,
-                        GlobalCommands.NextInlineCommentId,
+                        Guids.CommandSetString,
+                        PkgCmdIDList.NextInlineCommentId,
                         ref param,
                         null);
                 }

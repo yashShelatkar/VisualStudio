@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio
     // This fires before ShellInitialized and SolutionExists.
     //[ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
 
-    [Guid(GuidList.guidAssemblyResolverPkgString)]
+    [Guid(Guids.guidAssemblyResolverPkgString)]
     public class AssemblyResolverPackage : Package
     {
         // list of assemblies that should be resolved by name only
@@ -25,6 +25,10 @@ namespace GitHub.VisualStudio
             // resolver is required for these
             "GitHub.UI",
             "GitHub.VisualStudio.UI",
+
+            // these are signed by StrongNameSigner
+            "Markdig",
+            "Markdig.Wpf",
 
             // these are included just in case
             "GitHub.UI.Reactive",

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using System.ComponentModel;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -7,6 +8,11 @@ namespace GitHub.InlineReviews.ViewModels
     {
         int? number;
         string title;
+
+        public PullRequestStatusViewModel(ICommand showDetailsCommand)
+        {
+            ShowDetailsCommand = showDetailsCommand;
+        }
 
         public int? Number
         {
@@ -33,6 +39,8 @@ namespace GitHub.InlineReviews.ViewModels
                 }
             }
         }
+
+        public ICommand ShowDetailsCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

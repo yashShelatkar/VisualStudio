@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
-using System.ComponentModel;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -22,12 +24,52 @@ namespace GitHub.InlineReviews.Services
         readonly PullRequestStatusViewModel pullRequestStatusViewModel;
 
         [ImportingConstructor]
-        public PullRequestStatusManager(IPullRequestSessionManager pullRequestSessionManager) : this(new PullRequestStatusViewModel())
+        public PullRequestStatusManager(SVsServiceProvider serviceProvider, IPullRequestSessionManager pullRequestSessionManager)
+            : this(CreatePullRequestStatusViewModel(serviceProvider))
         {
             this.pullRequestSessionManager = pullRequestSessionManager;
 
             RefreshCurrentSession();
             pullRequestSessionManager.PropertyChanged += PullRequestSessionManager_PropertyChanged;
+        }
+
+        public PullRequestStatusManager(PullRequestStatusViewModel pullRequestStatusViewModel)
+        {
+            this.pullRequestStatusViewModel = pullRequestStatusViewModel;
+            mainWindow = Application.Current.MainWindow;
+        }
+
+        static PullRequestStatusViewModel CreatePullRequestStatusViewModel(IServiceProvider serviceProvider)
+        {
+            var command = new ShowGitHubPaneCommand(serviceProvider);
+            return new PullRequestStatusViewModel(command);
+        }
+
+        class ShowGitHubPaneCommand : ICommand
+        {
+            readonly IServiceProvider serviceProvider;
+
+            internal ShowGitHubPaneCommand(IServiceProvider serviceProvider)
+            {
+                this.serviceProvider = serviceProvider;
+            }
+
+            public bool CanExecute(object parameter) => true;
+
+            public void Execute(object parameter)
+            {
+                try
+                {
+                    var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                    dte.ExecuteCommand("View.GitHub");
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Trace.WriteLine(e);
+                }
+            }
+
+            public event EventHandler CanExecuteChanged;
         }
 
         void PullRequestSessionManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -43,12 +85,6 @@ namespace GitHub.InlineReviews.Services
             var pullRequest = pullRequestSessionManager.CurrentSession?.PullRequest;
             pullRequestStatusViewModel.Number = pullRequest?.Number;
             pullRequestStatusViewModel.Title = pullRequest?.Title;
-        }
-
-        public PullRequestStatusManager(PullRequestStatusViewModel pullRequestStatusViewModel)
-        {
-            this.pullRequestStatusViewModel = pullRequestStatusViewModel;
-            mainWindow = Application.Current.MainWindow;
         }
 
         public void ShowStatus()
@@ -137,7 +173,7 @@ namespace GitHub.InlineReviews.Services
             [STAThread]
             void Install()
             {
-                var viewModel = new PullRequestStatusViewModel { Number = 666, Title = "A beast of a PR" };
+                var viewModel = new PullRequestStatusViewModel(null) { Number = 666, Title = "A beast of a PR" };
                 var provider = new PullRequestStatusManager(viewModel);
                 provider.HideStatus();
                 provider.ShowStatus();

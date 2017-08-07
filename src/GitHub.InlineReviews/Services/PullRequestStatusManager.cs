@@ -10,6 +10,7 @@ using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
+using GitHub.VisualStudio;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -61,10 +62,13 @@ namespace GitHub.InlineReviews.Services
                 try
                 {
                     var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-                    dte.ExecuteCommand("View.GitHub");
+                    object customIn = null;
+                    object customOut = null;
+                    dte.Commands.Raise(Guids.guidGitHubCmdSetString, PkgCmdIDList.showCurrentPullRequestCommand, ref customIn, ref customOut);
                 }
                 catch (Exception e)
                 {
+                    VsOutputLogger.WriteLine("Couldn't raise {0}: {1}", nameof(PkgCmdIDList.openPullRequestsCommand), e);
                     System.Diagnostics.Trace.WriteLine(e);
                 }
             }

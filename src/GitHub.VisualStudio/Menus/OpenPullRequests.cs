@@ -1,7 +1,6 @@
-﻿using GitHub.Exports;
+﻿using System;
+using GitHub.Exports;
 using GitHub.UI;
-using GitHub.VisualStudio.UI;
-using System;
 using GitHub.Services;
 using GitHub.Extensions;
 

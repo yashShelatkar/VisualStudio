@@ -22,7 +22,12 @@ namespace GitHub.VisualStudio.Menus
         public void Activate(object data = null)
         {
             var pullRequestSessionManager = ServiceProvider.ExportProvider.GetExportedValueOrDefault<IPullRequestSessionManager>();
-            var session = pullRequestSessionManager.CurrentSession;
+            var session = pullRequestSessionManager?.CurrentSession;
+            if (session == null)
+            {
+                return; // No active PR session.
+            }
+
             var pullRequest = session.PullRequest;
             var arg = new PullRequestDetailArgument { RepositoryOwner = session.RepositoryOwner, Number = pullRequest.Number };
             var viewWithData = new ViewWithData(UIControllerFlow.PullRequestDetail) { Data = arg };

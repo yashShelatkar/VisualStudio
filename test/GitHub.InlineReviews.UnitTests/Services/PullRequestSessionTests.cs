@@ -587,7 +587,7 @@ Line 4";
 
                     // Simulate calling GetFile with a file that's not yet been initialized
                     // while doing the Update.
-                    service.WhenForAnyArgs(x => x.Diff(null, null, null, null))
+                    service.WhenForAnyArgs(x => x.Diff(null, null, null, null, null))
                         .Do(_ => target.GetFile("other.cs").Forget());
 
                     await target.Update(pullRequest);
@@ -641,12 +641,14 @@ Line 4";
                 Arg.Any<ILocalRepositoryModel>(),
                 Arg.Any<string>(),
                 Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<byte[]>())
                 .Returns(i => diffService.Diff(
                     null,
                     i.ArgAt<string>(1),
                     i.ArgAt<string>(2),
-                    i.ArgAt<byte[]>(3)));
+                    i.ArgAt<string>(3),
+                    i.ArgAt<byte[]>(4)));
             result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
 
             var diffChunk = "@@ -1,4 +1,4 @@";

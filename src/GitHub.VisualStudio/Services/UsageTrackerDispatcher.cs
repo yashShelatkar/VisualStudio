@@ -2,11 +2,11 @@
 using System.ComponentModel.Composition;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.Shell;
-using System.Threading.Tasks;
+using GitHub.Exports;
 
 namespace GitHub.Services
 {
-    [Export(typeof(IUsageTracker))]
+    [ExportForProcess(typeof(IUsageTracker), "devenv")]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class UsageTrackerDispatcher : IUsageTracker
     {
@@ -39,6 +39,6 @@ namespace GitHub.Services
         public Task IncrementPRDetailsCompareWithSolution() => inner.IncrementPRDetailsCompareWithSolution();
         public Task IncrementPRDetailsOpenFileInSolution() => inner.IncrementPRDetailsOpenFileInSolution();
         public Task IncrementPRReviewDiffViewInlineCommentOpen() => inner.IncrementPRReviewDiffViewInlineCommentOpen();
-        public Task IncrementPRReviewDiffViewInlineCommentPost()=>  inner.IncrementPRReviewDiffViewInlineCommentPost();
+        public Task IncrementPRReviewDiffViewInlineCommentPost() => inner.IncrementPRReviewDiffViewInlineCommentPost();
     }
 }
